@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vietnamese Vocabulary Quiz Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --paper: #ffffff;
+    --panel: #fafaf8;
+    --aged: #ece8de;
+    --red: #b5232a;
+    --gold: #a9781f;
+    --muted: #6b6357;
+    --rule: #d8d2c2;
+    --green: #2a7a3b;
+    --border: #e2ded2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Libre Baskerville', Georgia, serif;
+    min-height: 100vh;
+  }
+
+  #control-panel {
+    background: var(--panel);
+    color: var(--ink);
+    padding: 2rem 3rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .panel-header h1 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .panel-header .subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .panel-rule {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1rem 0 1.5rem;
+  }
+
+  .panel-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .source-status {
+    border: 1.5px solid var(--border);
+    background: white;
+    border-radius: 4px;
+    padding: 1rem 1.3rem;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+  }
+
+  .source-status.ok { border-color: var(--green); }
+  .source-status.error { border-color: var(--red); }
+
+  .source-icon { font-size: 1.3rem; line-height: 1; flex-shrink: 0; }
+
+  .source-text { flex: 1; }
+
+  .source-text .main {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.8rem;
+    color: var(--ink);
+    margin-bottom: 0.2rem;
+  }
+
+  .source-text .sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+  }
+
+  .source-text .sub.ok { color: var(--green); }
+  .source-text .sub.error { color: #a13636; }
+
+  .refresh-btn {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: 2px;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+
+  .refresh-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .lesson-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  #lesson-list-empty {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-style: italic;
+    padding: 0.3rem 0;
+  }
+
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.45rem;
+  }
+
+  .lesson-item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    cursor: pointer;
+    padding: 0.38rem 0.55rem;
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 2px;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+
+  .lesson-item:hover { border-color: var(--gold); background: #fdf6e8; }
+  .lesson-item.active { border-color: var(--gold); background: #fbf0d9; }
+
+  .lesson-item input[type="checkbox"] {
+    accent-color: var(--gold);
+    width: 12px; height: 12px;
+    cursor: pointer; flex-shrink: 0;
+  }
+
+  .lesson-item span.lname {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.66rem;
+    color: var(--ink);
+    white-space: nowrap;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lesson-item .count {
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    flex-shrink: 0;
+  }
+
+  .quick-links {
+    margin-top: 0.65rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .quick-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: underline;
+    letter-spacing: 0.05em;
+    border: none;
+    background: none;
+    padding: 0;
+  }
+
+  .quick-link:hover { color: var(--gold); }
+
+  #pool-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .controls-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    min-width: 200px;
+  }
+
+  .control-group label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.45rem;
+  }
+
+  .toggle-row { display: flex; gap: 0.4rem; }
+
+  .toggle-btn {
+    flex: 1;
+    padding: 0.42rem 0.55rem;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s ease;
+  }
+
+  .toggle-btn.active { background: var(--red); border-color: var(--red); color: white; }
+  .toggle-btn:hover:not(.active) { border-color: var(--gold); color: var(--gold); }
+
+  .generate-btn {
+    width: 100%;
+    padding: 0.72rem 1rem;
+    background: var(--red);
+    border: none;
+    color: white;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s ease;
+    margin-top: 0.3rem;
+  }
+
+  .generate-btn:hover { background: #8f1a20; }
+  .generate-btn:disabled { background: #c9c4b6; cursor: not-allowed; }
+
+  .status-line {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--gold);
+    text-align: center;
+    min-height: 1em;
+    line-height: 1.4;
+  }
+
+  #action-bar {
+    background: white;
+    border-top: 1px solid var(--border);
+    padding: 0.85rem 3rem;
+    display: none;
+    gap: 0.8rem;
+    align-items: center;
+    position: sticky;
+    bottom: 0;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+  }
+
+  #action-bar.visible { display: flex; }
+
+  .action-btn {
+    padding: 0.48rem 1.1rem;
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s ease;
+    text-transform: uppercase;
+  }
+
+  .action-btn:hover { background: var(--ink); color: white; }
+  .action-btn.primary { background: var(--ink); color: white; }
+  .action-btn.primary:hover { background: var(--red); border-color: var(--red); }
+
+  .action-spacer { flex: 1; }
+
+  .action-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--muted);
+  }
+
+  #print-area {
+    display: none;
+    padding: 2.5rem 3rem;
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+  }
+
+  #print-area.visible { display: block; }
+
+  .sheet-header {
+    border-bottom: 2.5px solid var(--ink);
+    padding-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 2rem;
+  }
+
+  .sheet-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .sheet-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    align-items: flex-end;
+  }
+
+  .meta-field {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    white-space: nowrap;
+  }
+
+  .meta-field .field-line {
+    display: inline-block;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .sheet-instruction {
+    font-family: 'Libre Baskerville', serif;
+    font-style: italic;
+    font-size: 0.78rem;
+    color: var(--muted);
+    padding: 0.55rem 0;
+    margin-bottom: 0.7rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .word-table {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 2.5rem;
+  }
+
+  .word-entry {
+    display: grid;
+    grid-template-columns: 1.6rem 1fr 1.5fr;
+    gap: 0 0.5rem;
+    align-items: baseline;
+    padding: 0.27rem 0;
+    border-bottom: 1px solid var(--aged);
+  }
+
+  .word-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--muted);
+    text-align: right;
+    padding-right: 0.3rem;
+  }
+
+  .word-prompt {
+    font-family: 'Noto Serif', serif;
+    font-size: 0.82rem;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .word-blank {
+    border-bottom: 1px solid var(--rule);
+    height: 1.05rem;
+  }
+
+  .sheet-footer {
+    margin-top: 1.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--aged);
+  }
+
+  .sheet-footer .footer-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  @media print {
+    #control-panel, #action-bar { display: none !important; }
+    #print-area { display: block !important; padding: 0.5cm 1cm; max-width: 100%; }
+    body { background: white; }
+    .word-table { column-gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="control-panel">
+  <div class="panel-header">
+    <h1>Vietnamese Vocabulary Quiz Generator</h1>
+    <span class="subtitle">Japanese → Vietnamese</span>
+  </div>
+  <hr class="panel-rule">
+
+  <div class="panel-grid">
+
+    <div>
+      <div class="source-status" id="source-status">
+        <div class="source-icon" id="source-icon">⏳</div>
+        <div class="source-text">
+          <div class="main" id="source-main">Loading word data…</div>
+          <div class="sub" id="source-sub">Fetching word_*.md files…</div>
+        </div>
+        <button class="refresh-btn" onclick="location.reload()">↺ Refresh</button>
+      </div>
+
+      <div class="lesson-label">Detected Word Lists</div>
+      <div id="lesson-container">
+        <div id="lesson-list-empty">No word_*.md files found yet.</div>
+        <div class="lesson-grid" id="lesson-grid" style="display:none;"></div>
+      </div>
+
+      <div class="quick-links" id="quick-links" style="display:none;">
+        <button class="quick-link" onclick="selectAll(true)">select all</button>
+        <button class="quick-link" onclick="selectAll(false)">deselect all</button>
+        <span id="pool-count"></span>
+      </div>
+    </div>
+
+    <div class="controls-right">
+      <div class="control-group">
+        <label>Number of Words</label>
+        <div class="toggle-row">
+          <button class="toggle-btn active" onclick="setCount(50, this)">50</button>
+          <button class="toggle-btn" onclick="setCount(100, this)">100</button>
+        </div>
+      </div>
+
+      <button class="generate-btn" id="gen-btn" onclick="generateTest()" disabled>Generate Quiz →</button>
+      <div class="status-line" id="status-line">Waiting for word list files…</div>
+    </div>
+  </div>
+</div>
+
+<div id="action-bar">
+  <button class="action-btn primary" onclick="window.print()">⎙ Print / Save PDF</button>
+  <button class="action-btn" onclick="generateTest()">↺ Regenerate</button>
+  <div class="action-spacer"></div>
+  <span class="action-note">Choose "Save as PDF" in the print dialog for a digital copy</span>
+</div>
+
+<div id="print-area"></div>
+
+<script>
+const lessons = {};
+const selectedLessons = new Set();
+let wordCount = 50;
+
+async function loadWordFiles() {
+  const iconEl = document.getElementById('source-icon');
+  const mainEl = document.getElementById('source-main');
+  const subEl = document.getElementById('source-sub');
+  const statusBox = document.getElementById('source-status');
+
+  statusBox.classList.remove('ok', 'error');
+
+  let data;
+  try {
+    const res = await fetch('/api/word-lists');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    data = await res.json();
+  } catch (err) {
+    statusBox.classList.add('error');
+    iconEl.textContent = '⚠';
+    mainEl.textContent = 'Could not reach the local server';
+    subEl.classList.add('error');
+    subEl.innerHTML = `Run <code style="color:#a9781f">python3 server.py</code> in this folder and open ` +
+      `<code style="color:#a9781f">http://localhost:8000</code> instead of opening this file directly.`;
+    updatePoolCount();
+    return;
+  }
+
+  const labels = Object.keys(data);
+  if (labels.length === 0) {
+    statusBox.classList.add('error');
+    iconEl.textContent = '⚠';
+    mainEl.textContent = 'No word lists found';
+    subEl.classList.add('error');
+    subEl.textContent = 'No word_*.md files with a valid table were found in this folder.';
+    updatePoolCount();
+    return;
+  }
+
+  labels.forEach(label => {
+    lessons[label] = data[label];
+    selectedLessons.add(label);
+  });
+
+  statusBox.classList.add('ok');
+  iconEl.textContent = '✓';
+  mainEl.textContent = `${labels.length} word list${labels.length > 1 ? 's' : ''} loaded`;
+  subEl.classList.add('ok');
+  subEl.textContent = labels.join(', ');
+
+  sortAndRenderLessons();
+  updatePoolCount();
+}
+
+function sortAndRenderLessons() {
+  const keys = Object.keys(lessons).sort((a, b) => {
+    const na = parseInt(a.match(/\d+/)?.[0] || '0');
+    const nb = parseInt(b.match(/\d+/)?.[0] || '0');
+    return na - nb || a.localeCompare(b);
+  });
+
+  const grid = document.getElementById('lesson-grid');
+  grid.innerHTML = '';
+  document.getElementById('lesson-list-empty').style.display = 'none';
+  grid.style.display = 'grid';
+  document.getElementById('quick-links').style.display = 'flex';
+
+  keys.forEach(label => {
+    const count = lessons[label].length;
+    const isActive = selectedLessons.has(label);
+    const item = document.createElement('div');
+    item.className = 'lesson-item' + (isActive ? ' active' : '');
+    item.dataset.lesson = label;
+    const safeId = label.replace(/\s/g, '_');
+    item.innerHTML = `
+      <input type="checkbox" ${isActive ? 'checked' : ''} id="cb_${safeId}" onchange="toggleLesson('${label}', this)">
+      <span class="lname">${label}</span>
+      <span class="count">${count}</span>
+    `;
+    item.addEventListener('click', function(e) {
+      if (e.target.tagName !== 'INPUT') {
+        const cb = this.querySelector('input');
+        cb.checked = !cb.checked;
+        toggleLesson(label, cb);
+      }
+    });
+    grid.appendChild(item);
+  });
+}
+
+function toggleLesson(lesson, cb) {
+  if (cb.checked) { selectedLessons.add(lesson); cb.closest('.lesson-item').classList.add('active'); }
+  else { selectedLessons.delete(lesson); cb.closest('.lesson-item').classList.remove('active'); }
+  updatePoolCount();
+}
+
+function selectAll(state) {
+  document.querySelectorAll('.lesson-item').forEach(item => {
+    const label = item.dataset.lesson;
+    const cb = item.querySelector('input');
+    cb.checked = state;
+    if (state) { selectedLessons.add(label); item.classList.add('active'); }
+    else { selectedLessons.delete(label); item.classList.remove('active'); }
+  });
+  updatePoolCount();
+}
+
+function updatePoolCount() {
+  let total = 0;
+  selectedLessons.forEach(l => { if (lessons[l]) total += lessons[l].length; });
+
+  document.getElementById('pool-count').textContent = `${total} words in pool`;
+
+  const btn = document.getElementById('gen-btn');
+  const status = document.getElementById('status-line');
+
+  if (Object.keys(lessons).length === 0) {
+    btn.disabled = true;
+    status.textContent = 'Waiting for word list files…';
+  } else if (selectedLessons.size === 0) {
+    btn.disabled = true;
+    status.textContent = 'Select at least one list.';
+  } else if (total < wordCount) {
+    btn.disabled = false;
+    status.textContent = `Pool (${total}) < ${wordCount} — all ${total} words will be used.`;
+  } else {
+    btn.disabled = false;
+    status.textContent = '';
+  }
+}
+
+function setCount(n, btn) {
+  wordCount = n;
+  document.querySelectorAll('.toggle-row .toggle-btn').forEach(b => {
+    if (b.textContent === '50' || b.textContent === '100') b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  updatePoolCount();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function generateTest() {
+  if (selectedLessons.size === 0 || Object.keys(lessons).length === 0) return;
+
+  let pool = [];
+  selectedLessons.forEach(l => { if (lessons[l]) pool.push(...lessons[l]); });
+
+  const words = shuffle(pool).slice(0, Math.min(wordCount, pool.length));
+  renderSheet(words);
+}
+
+function renderSheet(words) {
+  const instruction = 'Write the Vietnamese word that matches each Japanese term below.';
+  const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+  const half = Math.ceil(words.length / 2);
+  const col1 = words.slice(0, half);
+  const col2 = words.slice(half);
+
+  const renderEntry = (word, idx) => `
+      <div class="word-entry">
+        <span class="word-num">${idx}</span>
+        <span class="word-prompt">${word.jp}</span>
+        <span class="word-blank"></span>
+      </div>`;
+
+  document.getElementById('print-area').innerHTML = `
+    <div class="sheet-header">
+      <div>
+        <div class="sheet-title">Vietnamese Vocabulary Quiz</div>
+      </div>
+      <div class="sheet-meta">
+        <div class="meta-field">Name: <span class="field-line" style="width:130px;"></span></div>
+        <div class="meta-field">Date: <span class="field-line" style="width:85px;"></span></div>
+        <div class="meta-field">Score: <span class="field-line" style="width:55px;"></span> / ${words.length}</div>
+      </div>
+    </div>
+
+    <div class="sheet-instruction">${instruction}</div>
+
+    <div class="word-table">
+      <div>${col1.map((w, i) => renderEntry(w, i + 1)).join('')}</div>
+      <div>${col2.map((w, i) => renderEntry(w, i + half + 1)).join('')}</div>
+    </div>
+
+    <div class="sheet-footer">
+      <span class="footer-note">Generated: ${today} &nbsp;·&nbsp; ${words.length} words</span>
+    </div>
+  `;
+
+  document.getElementById('print-area').classList.add('visible');
+  document.getElementById('action-bar').classList.add('visible');
+  document.getElementById('print-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+loadWordFiles();
+</script>
+</body>
+</html>
