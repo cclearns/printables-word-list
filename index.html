@@ -405,8 +405,7 @@
   }
 
   .word-blank {
-    border-bottom: 1px solid var(--rule);
-    height: 1.05rem;
+     height: 1.05rem;
   }
 
   .sheet-footer {
@@ -649,7 +648,7 @@ function generateTest() {
 }
 
 function renderSheet(words) {
-  const instruction = 'Write the Vietnamese word that matches each Japanese term below.';
+  const instruction = 'Viết nghĩa của các từ tiếng Nhật sau đây';
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
   const half = Math.ceil(words.length / 2);
@@ -666,12 +665,12 @@ function renderSheet(words) {
   document.getElementById('print-area').innerHTML = `
     <div class="sheet-header">
       <div>
-        <div class="sheet-title">Vietnamese Vocabulary Quiz</div>
+        <div class="sheet-title">Kiểm tra từ vựng đầu giờ</div>
       </div>
       <div class="sheet-meta">
-        <div class="meta-field">Name: <span class="field-line" style="width:130px;"></span></div>
-        <div class="meta-field">Date: <span class="field-line" style="width:85px;"></span></div>
-        <div class="meta-field">Score: <span class="field-line" style="width:55px;"></span> / ${words.length}</div>
+        <div class="meta-field">Tên: <span class="field-line" style="width:130px;"></span></div>
+        <div class="meta-field">Ngày: <span class="field-line" style="width:85px;"></span></div>
+        <div class="meta-field">Điểm: <span class="field-line" style="width:55px;"></span> / ${words.length}</div>
       </div>
     </div>
 
