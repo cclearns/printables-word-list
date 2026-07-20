@@ -24,15 +24,6 @@
 | người Úc | オーストラリア人 |
 | người Nhật | 日本人 |
 | A! | あ！ |
-
-## Quốc gia (Countries)
-
-| Tiếng Việt | Tiếng Nhật |
-| --- | --- |
-| Việt Nam | ベトナム |
-| Nga | ロシア |
-| Trung Quốc | 中国 |
-| Hàn Quốc | 韓国 |
 | Ý | イタリア |
 | Úc | オーストラリア |
 
