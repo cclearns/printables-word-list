@@ -39,7 +39,7 @@
 | nuôi | 育てる |
 | phải + 動詞 | 〜するべきだ |
 | quan trọng | 重要な |
-| Quán cà phê Trung Nguyên | チュングエンカフェ |
+| Quán cà phê | カフェ |
 | rõ | 明確な |
 | sống | 生活する、生きる |
 | sờ vào ~ | 〜に触る |

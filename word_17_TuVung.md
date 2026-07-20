@@ -3,10 +3,9 @@
 | Tiếng Việt | Tiếng Nhật |
 | --- | --- |
 | bác | おじさん |
-| Bác Hồ | ホーおじさん |
 | bản | 原稿 |
 | búp-bê | 人形 |
-| （không + 動詞 + 疑問詞 + cả） | 全く…も～ない |
+| cả | 全く…も～ない
 | chị em | 姉妹 |
 | chống ~ | ～に抗する |
 | con gái | 娘、娘さん |
@@ -26,18 +25,16 @@
 | hồng | バラ |
 | kêu gọi | 呼びかける |
 | kháng chiến | 抗戦 |
-| kháng chiến chống Mỹ cứu nước | 抗米救国戦争 |
 | kỷ niệm | 記念 |
 | lá | 葉 |
 | mà | 関係詞 |
-| ngày kỷ niệm Việt Nam Độc Lập | ベトナム独立記念の日 |
 | người bạn | 友だち |
 | nhài | ジャスミン |
 | nhân dân | 人民 |
 | nở | 咲く |
 | nơi | ところ、場所 |
 | qua CD | CDを通して |
-| Quảng trường Ba Đình | バーディン広場 |
+| Quảng trường | 広場 |
 | quen | 知り合う |
 | thơm thơm | 香りがいい |
 | tiếng nói | （話す）声、肉声 |

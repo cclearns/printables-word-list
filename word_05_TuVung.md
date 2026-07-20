@@ -10,18 +10,30 @@
 | đi thăm | 訪れる |
 | thăm | 見学する、訪れる |
 | đứng | 立つ |
+| hôm kia | 一昨日 |
+| hôm qua | 昨日 |
 | hơi ~ | 少し～だ |
+| Huế | フエ |
 | khoảng ~ | 〜ごろ |
 | làm việc | 仕事をする |
 | làm | する |
 | việc | 仕事 |
 | lúc | 時 |
 | mệt | 疲れる |
+| ngày mai | 明日 |
 | nghỉ | 休む |
 | ngồi | 座る |
 | sẽ + 動詞 | 未来を表す |
+| tháng trước | 先月 |
 | tháng | 月 |
 | trước | 前の |
+| thứ bảy | 土曜日 |
+| thứ hai | 月曜日 |
+| tối qua | 昨晩 |
+| tuần sau | 来週 |
+| tuần | 週 |
+| sau | あとの |
+| tuần trước | 先週 |
 | vào lúc ~ | ～時に |
 | vào | 入る |
 | về | 帰る |
