@@ -53,3 +53,44 @@ def build_word_lists(folder: Path):
         if words:
             lessons[label_from_filename(path.name)] = words
     return lessons
+
+
+# --- Google Sheet words (Lớp A / Lớp B) -------------------------------------
+
+SHEET_ID = "1j0pzmkdrrA5iwhoNOAgYncC33RdqMDoitSd6b9yv39M"
+SHEET_TABS = {"Lớp A": "837535482", "Lớp B": "0"}  # tab name -> gid
+
+
+def parse_sheet_csv(text: str):
+    """Rows are: Loại từ, Tiếng Việt, Tiếng Nhật, Chú ý. Keep rows with both languages."""
+    import csv
+    import io
+
+    words = []
+    for row in csv.reader(io.StringIO(text)):
+        if len(row) < 3:
+            continue
+        vi, jp = row[1].strip(), row[2].strip()
+        if not vi or not jp or vi.lower() in ("tiếng việt", "vietnamese"):
+            continue
+        words.append({"vi": vi, "jp": jp})
+    return words
+
+
+def fetch_sheet_words(timeout: int = 20):
+    """Download each tab of the public Google Sheet as CSV. A tab that fails is omitted."""
+    from urllib.request import urlopen
+
+    tabs = {}
+    for name, gid in SHEET_TABS.items():
+        url = (f"https://docs.google.com/spreadsheets/d/{SHEET_ID}"
+               f"/export?format=csv&gid={gid}")
+        try:
+            with urlopen(url, timeout=timeout) as res:
+                words = parse_sheet_csv(res.read().decode("utf-8"))
+        except Exception as err:
+            print(f"Could not fetch Google Sheet tab {name}: {err}")
+            continue
+        if words:
+            tabs[name] = words
+    return tabs

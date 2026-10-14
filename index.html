@@ -491,8 +491,30 @@
 const lessons = {};
 const selectedLessons = new Set();
 let wordCount = 50;
+const SHEET_SHARE = 0.2;  // share of the quiz taken from the Google Sheet, appended at the end (50 -> 10, 100 -> 20)
+let sheetWords = { 'Lớp A': [], 'Lớp B': [] };
+
+async function loadSheetWords() {
+  try {
+    const res = await fetch('sheet-words.json');
+    if (res.ok) sheetWords = await res.json();
+  } catch (err) { /* sheet words are optional */ }
+}
+
+// Pick n words at random, split evenly between Lớp A and Lớp B.
+function pickSheetWords(n) {
+  const tabs = Object.values(sheetWords).filter(w => w.length > 0);
+  if (tabs.length === 0) return [];
+  const picked = [];
+  tabs.forEach((words, i) => {
+    const share = Math.floor(n / tabs.length) + (i < n % tabs.length ? 1 : 0);
+    picked.push(...shuffle(words).slice(0, share));
+  });
+  return picked;
+}
 
 async function loadWordFiles() {
+  loadSheetWords();
   const iconEl = document.getElementById('source-icon');
   const mainEl = document.getElementById('source-main');
   const subEl = document.getElementById('source-sub');
@@ -643,8 +665,10 @@ function generateTest() {
   let pool = [];
   selectedLessons.forEach(l => { if (lessons[l]) pool.push(...lessons[l]); });
 
-  const words = shuffle(pool).slice(0, Math.min(wordCount, pool.length));
-  renderSheet(words);
+  // e.g. 50 = 40 md + 10 sheet, 100 = 80 md + 20 sheet
+  const extra = pickSheetWords(Math.round(wordCount * SHEET_SHARE));
+  const mdWords = shuffle(pool).slice(0, Math.min(wordCount - extra.length, pool.length));
+  renderSheet([...mdWords, ...extra]);
 }
 
 function renderSheet(words) {
